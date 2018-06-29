@@ -1,0 +1,9 @@
+coverage
+node_modules/*
+npm-shrinkwrap.json
+npm-debug.log
+tmp
+.project
+.DS_Store
+.idea/
+node_modules
