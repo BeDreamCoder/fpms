@@ -14,7 +14,7 @@ var SignContent = protos.SignContent;
 
 var server_address = 'http://' + config.host + ':' + config.port;
 
-function _sha256(ccId, fcn, arg, msg, counter, inkLimit, senderAddress) {
+function _sha256(ccId, fcn, arg, msg, counter, feeLimit, senderAddress) {
     var signContent = new SignContent();
 
     var args = [];
@@ -34,7 +34,7 @@ function _sha256(ccId, fcn, arg, msg, counter, inkLimit, senderAddress) {
     var senderSpec = {
         sender: Buffer.from(senderAddress),
         counter: Long.fromString(counter.toString()),
-        ink_limit: Buffer.from(inkLimit),
+        fee_limit: Buffer.from(feeLimit),
         msg: Buffer.from(msg)
     };
 
@@ -44,7 +44,7 @@ function _sha256(ccId, fcn, arg, msg, counter, inkLimit, senderAddress) {
     return dataHash.toString('hex');
 }
 
-function _invoke(sender, ccId, fcn, args, msg, counter, inkLimit, sig) {
+function _invoke(sender, ccId, fcn, args, msg, counter, feeLimit, sig) {
     let data = {
         cc_id: ccId,
         fcn: fcn,
@@ -52,7 +52,7 @@ function _invoke(sender, ccId, fcn, args, msg, counter, inkLimit, sig) {
         args: args,
         message: msg,
         counter: counter,
-        ink_limit: inkLimit,
+        fee_limit: feeLimit,
         sig: sig
     };
     return fetch("http://" + server_address + "/invoke", {
@@ -85,9 +85,9 @@ function getPermission(fcn, args, key, address) {
     // 1.query sender counter
     return queryCounter(address).then((results) => {
         let ccId = 'token';
-        let inkLimit = '100000000000';
+        let feeLimit = '100000000000';
         let counter = results.json().data;
-        let dataHash = _sha256(ccId, fcn, args, '', counter, inkLimit, address);
+        let dataHash = _sha256(ccId, fcn, args, '', counter, feeLimit, address);
         // 2. get tx sign
         return verifyHandler.signTx(key, dataHash).then((signResp) => {
             let ret;
@@ -100,7 +100,7 @@ function getPermission(fcn, args, key, address) {
             // 5. invoke chaincode
             // TODO
             let sig = '';
-            return _invoke(address, ccId, fcn, args, '', counter, inkLimit, sig);
+            return _invoke(address, ccId, fcn, args, '', counter, feeLimit, sig);
         }, (err) => {
             return Promise.reject(err);
         }).then((result) => {
@@ -181,17 +181,17 @@ function queryCounter(address) {
 function sha256_data(fcn, args, key, address) {
     // return queryCounter(address).then((results) => {
     //     let ccId = 'token';
-    //     let inkLimit = '100000000000';
+    //     let feeLimit = '100000000000';
     //     let counter = results.json().data;
-    //     return Promise.resolve(_sha256(ccId, fcn, args, '', counter, inkLimit, address));
+    //     return Promise.resolve(_sha256(ccId, fcn, args, '', counter, feeLimit, address));
     // }).catch(err => {
     //     return Promise.reject(err);
     // });
 
     let ccId = 'token';
-    let inkLimit = '100000000000';
+    let feeLimit = '100000000000';
     let counter = 0;
-    return Promise.resolve(_sha256(ccId, fcn, args, '', counter, inkLimit, address));
+    return Promise.resolve(_sha256(ccId, fcn, args, '', counter, feeLimit, address));
 
 }
 

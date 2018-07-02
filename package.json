@@ -1,9 +1,9 @@
 {
-  "name": "ink-interface",
+  "name": "offline-sign-interface",
   "version": "0.0.1",
   "repository": {
     "type": "github",
-    "url": "http://www.github.com/inklabsfoundation/inkchain-sdk-node"
+    "url": "http://www.github.com/ziggurat/offline-sign-interface"
   },
   "devDependencies": {
     "log4js": "^0.6.38"
@@ -12,7 +12,7 @@
   "licenses": [
     {
       "type": "Apache-2.0",
-      "url": "https://github.com/inklabsfoundation/inkchain/blob/master/LICENSE"
+      "url": "https://github.com/ziggurat/zigledger/blob/master/LICENSE"
     }
   ],
   "dependencies": {
