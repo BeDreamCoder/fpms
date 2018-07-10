@@ -145,8 +145,8 @@ module.exports.getPublicKeyAndAddress = getPublicKeyAndAddress;
 module.exports.getDataTag = getDataTag;
 module.exports.queryUser = queryUser;
 module.exports.getUploadPermission = function (args, key, address) {
-    return getPermission('getUploadPermission', args, key, address);
+    return getPermission('getDataAccessPermission', args, key, address);
 };
 module.exports.getDownloadPermission = function (args, key, address) {
-    return getPermission('getDownloadPermission', args, key, address);
+    return getPermission('getDataAccessPermission', args, key, address);
 };
