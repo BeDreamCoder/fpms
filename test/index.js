@@ -24,4 +24,11 @@ impl.checkUKey().then((res) => {
     impl.getPublicKeyAndAddress(key).then((res) => {
         console.log(res);
     });
+
+    impl.getDataTag("ie43e15257182377bc957a99ce0ff65ff1c876a1b").then((res) => {
+        console.log(JSON.stringify(res));
+    });
+    impl.queryUser("ie43e15257182377bc957a99ce0ff65ff1c876a1b").then((res) => {
+        console.log(JSON.stringify(res));
+    });
 });

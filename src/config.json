@@ -1,6 +1,7 @@
 {
-  "server_address": "http://localhost:8081",
+  "server_address": "http://127.0.0.1:8081",
+  "hardware_address": "http://192.168.199.236:21727",
   "addressPrefix": "i",
-  "chaincodeId": "token",
+  "chaincodeId": "network",
   "feeLimit": "100000000000"
 }

@@ -8,13 +8,13 @@ SPDX-License-Identifier: Apache-2.0
  * Created by zhangtailin on 2018/6/25.
  */
 
+var config = require('../config.json');
 // var hardware_address = 'https://localhost.xiaoqiao.cat:21727';
-var hardware_address = 'http://192.168.2.83:21727';
-
 // var hardware_address = 'http://192.168.199.236:21727';
+// var hardware_address = 'http://192.168.2.83:21727';
 
 function listKeys() {
-    return fetch(hardware_address + '/list-keys', {
+    return fetch(config.hardware_address + '/list-keys', {
         method: "GET",
         headers: {
             "Content-Type": 'application/json'
@@ -38,7 +38,7 @@ function verifyPIN(key, pin) {
         "reader": key
     };
 
-    return fetch(hardware_address + "/apdu", {
+    return fetch(config.hardware_address + "/apdu", {
         method: "POST",
         headers: {
             "Content-Type": 'application/json'
@@ -69,7 +69,7 @@ function changePIN(key, oldpin, newpin) {
         "reader": key
     };
 
-    return fetch(hardware_address + "/apdu", {
+    return fetch(config.hardware_address + "/apdu", {
         method: "POST",
         headers: {
             "Content-Type": 'application/json'
@@ -88,7 +88,7 @@ function getPublicKeyAndAddress(key) {
         "reader": key
     };
 
-    return fetch(hardware_address + "/apdu", {
+    return fetch(config.hardware_address + "/apdu", {
         method: "POST",
         headers: {
             "Content-Type": 'application/json'
@@ -108,9 +108,7 @@ function signTx(key, dataHash) {
         "reader": key
     };
 
-    console.log(data);
-
-    return fetch(hardware_address + "/apdu", {
+    return fetch(config.hardware_address + "/apdu", {
         method: "POST",
         headers: {
             "Content-Type": 'application/json'
