@@ -49,7 +49,6 @@ function query(ccId, fcn, args) {
     }).then((result) => {
         return result.json();
     }).catch(err => {
-        console.log(err)
         return Promise.reject(err);
     });
 }
