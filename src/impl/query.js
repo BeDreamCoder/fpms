@@ -2,47 +2,10 @@
  * Created by zhangtailin on 2018/6/15.
  */
 
-var ethUtils = require('ethereumjs-util');
-var ProtoBuf = require('protobufjs');
 var config = require('../config.json');
-var Long = require('long');
-var path = require('path');
 var verifyHandler = require('./verify');
-var builder = ProtoBuf.loadProtoFile(path.join(__dirname + "/../../protos/chaincode.proto"));
-var protos = builder.build("protos");
-var SignContent = protos.SignContent;
 
 var server_address = 'http://' + config.host + ':' + config.port;
-
-function _sha256(ccId, fcn, arg, msg, counter, feeLimit, senderAddress) {
-    var signContent = new SignContent();
-
-    var args = [];
-    args.push(Buffer.from(fcn ? fcn : 'invoke', 'utf8'));
-    for (var i = 0; i < arg.length; i++) {
-        args.push(Buffer.from(arg[i], 'utf8'));
-    }
-    var invokeSpec = {
-        type: protos.ChaincodeSpec.Type.GOLANG,
-        chaincode_id: {
-            name: ccId
-        },
-        input: {
-            args: args
-        }
-    };
-    var senderSpec = {
-        sender: Buffer.from(senderAddress),
-        counter: Long.fromString(counter.toString()),
-        fee_limit: Buffer.from(feeLimit),
-        msg: Buffer.from(msg)
-    };
-
-    signContent.setChaincodeSpec(invokeSpec);
-    signContent.setSenderSpec(senderSpec);
-    let dataHash = ethUtils.sha256(signContent.toBuffer());
-    return dataHash.toString('hex');
-}
 
 function _invoke(sender, ccId, fcn, args, msg, counter, feeLimit, sig) {
     let data = {
@@ -164,38 +127,6 @@ function queryInfo(fcn, key, pin) {
         return Promise.reject(err);
     });
 }
-
-function queryCounter(address) {
-    let data = {
-        from_address: address,
-    };
-    return fetch(server_address + "/query-counter", {
-        method: "POST",
-        headers: {
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-}
-
-function sha256_data(fcn, args, key, address) {
-    // return queryCounter(address).then((results) => {
-    //     let ccId = 'token';
-    //     let feeLimit = '100000000000';
-    //     let counter = results.json().data;
-    //     return Promise.resolve(_sha256(ccId, fcn, args, '', counter, feeLimit, address));
-    // }).catch(err => {
-    //     return Promise.reject(err);
-    // });
-
-    let ccId = 'token';
-    let feeLimit = '100000000000';
-    let counter = 0;
-    return Promise.resolve(_sha256(ccId, fcn, args, '', counter, feeLimit, address));
-
-}
-
-module.exports.sha256_data = sha256_data;
 
 module.exports.getDataTag = function (key, pin) {
     queryInfo('getDataTag', key, pin);

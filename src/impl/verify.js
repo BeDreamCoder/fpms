@@ -1,3 +1,9 @@
+/*
+Copyright Ziggurat Corp. 2018 All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
 /**
  * Created by zhangtailin on 2018/6/25.
  */

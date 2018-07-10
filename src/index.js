@@ -1,3 +1,9 @@
+/*
+Copyright Ziggurat Corp. 2018 All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
 /**
  * Created by zhangtailin on 2018/6/15.
  */
@@ -6,8 +12,7 @@ require('es6-promise').polyfill();
 require('isomorphic-fetch');
 var config = require('./config.json');
 var verifyHandler = require('./impl/verify');
-var queryHandler = require('./impl/query');
-var ethUtils = require('ethereumjs-util');
+var hashHandler = require('./impl/hash');
 
 var checkUKey = () => {
     return verifyHandler.listKeys().then((res) => {
@@ -63,7 +68,7 @@ var getPublicKeyAndAddress = (key) => {
 
 function getSignTx(fcn, args, key, address) {
     // 1.query sender counter
-    return queryHandler.sha256_data(fcn, args, key, address).then((result) => {
+    return hashHandler.sha256_data(fcn, args, key, address).then((result) => {
         return verifyHandler.signTx(key, result);
     }, (err) => {
         return {result: false, code: '500', error: err};
@@ -72,9 +77,7 @@ function getSignTx(fcn, args, key, address) {
         let code = apdu.slice(apdu.length - 4);
         if (code === '9000') {
             let sig = apdu.slice(0, apdu.length - 4);
-            let sigV = ethUtils.toBuffer(parseInt(sig.slice(sig.length - 2), 16) - 27).toString('hex');
-
-            return {result: true, code: (sig.slice(0, sig.length - 2) + sigV).toLowerCase()};
+            return {result: true, code: sig.toLowerCase()};
         } else {
             return {result: false, code: apdu};
         }

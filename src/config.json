@@ -1,7 +1,6 @@
 {
-  "host": "localhost",
-  "port": "8081",
+  "server_address": "http://localhost:8081",
   "addressPrefix": "i",
-  "feeLimit": "100000000000",
-  "ccId": "token"
+  "chaincodeId": "token",
+  "feeLimit": "100000000000"
 }
