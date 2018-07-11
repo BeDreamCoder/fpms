@@ -145,8 +145,24 @@ module.exports.getPublicKeyAndAddress = getPublicKeyAndAddress;
 module.exports.getDataTag = getDataTag;
 module.exports.queryUser = queryUser;
 module.exports.getUploadPermission = function (args, key, address) {
-    return getPermission('getDataAccessPermission', args, key, address);
+    return getPermission('getDataAccessPermission', args, key, address).then((results) => {
+        if (results.success) {
+            return {result: true, data: results.data};
+        } else {
+            return {result: false, error: results.error};
+        }
+    }, (err) => {
+        return {result: false, error: err};
+    });
 };
 module.exports.getDownloadPermission = function (args, key, address) {
-    return getPermission('getDataAccessPermission', args, key, address);
+    return getPermission('getDataAccessPermission', args, key, address).then((results) => {
+        if (results.success) {
+            return {result: true, data: results.data};
+        } else {
+            return {result: false, error: results.error};
+        }
+    }, (err) => {
+        return {result: false, error: err};
+    });
 };
