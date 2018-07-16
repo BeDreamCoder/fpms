@@ -87,9 +87,9 @@ function getSignTx(fcn, args, key, address) {
 }
 
 function getPermission(fcn, args, key, address) {
-    return queryCounter(address).then((result) => {
+    return hashHandler.queryCounter(address).then((result) => {
         let counter = result.data;
-        let sigHash = _sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address);
+        let sigHash = hashHandler.sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address);
         return verifyHandler.signTx(key, sigHash).then((res) => {
             let apdu = res.apdu;
             let code = apdu.slice(apdu.length - 4);
@@ -97,7 +97,7 @@ function getPermission(fcn, args, key, address) {
                 let sig = apdu.slice(0, apdu.length - 4);
                 return queryHandler.invoke(address, config.chaincodeId, fcn, args, '',
                     counter, config.feeLimit, sig.toLowerCase()).then((results) => {
-                    return Promise.resolve(results.json());
+                    return Promise.resolve(results);
                 }, (err) => {
                     return Promise.reject(err);
                 });
@@ -145,6 +145,7 @@ module.exports.getPublicKeyAndAddress = getPublicKeyAndAddress;
 module.exports.getDataTag = getDataTag;
 module.exports.queryUser = queryUser;
 module.exports.getUploadPermission = function (args, key, address) {
+    args.push('8');
     return getPermission('getDataAccessPermission', args, key, address).then((results) => {
         if (results.success) {
             return {result: true, data: results.data};
@@ -156,6 +157,7 @@ module.exports.getUploadPermission = function (args, key, address) {
     });
 };
 module.exports.getDownloadPermission = function (args, key, address) {
+    args.push('4');
     return getPermission('getDataAccessPermission', args, key, address).then((results) => {
         if (results.success) {
             return {result: true, data: results.data};

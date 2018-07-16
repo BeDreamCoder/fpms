@@ -18,7 +18,7 @@ let root = protobufRoot.fromJSON(chaincode);
 var SignContent = root.lookupType('SignContent');
 var ChaincodeSpec = root.lookupType('ChaincodeSpec');
 
-function _sha256(ccId, fcn, arg, msg, counter, feeLimit, senderAddress) {
+function sha256(ccId, fcn, arg, msg, counter, feeLimit, senderAddress) {
     var args = [];
     var senderSpec = {
         sender: Buffer.from(senderAddress),
@@ -58,7 +58,7 @@ function _sha256(ccId, fcn, arg, msg, counter, feeLimit, senderAddress) {
 function sha256_data(fcn, args, key, address) {
     return queryCounter(address).then((results) => {
         let counter = results.data;
-        return Promise.resolve(_sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address));
+        return Promise.resolve(sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address));
     }).catch(err => {
         return Promise.reject(err);
     });
@@ -81,4 +81,6 @@ function queryCounter(address) {
     });
 }
 
+module.exports.sha256 = sha256;
+module.exports.queryCounter = queryCounter;
 module.exports.sha256_data = sha256_data;

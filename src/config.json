@@ -1,6 +1,6 @@
 {
-  "server_address": "http://127.0.0.1:8081",
-  "hardware_address": "http://192.168.199.236:21727",
+  "server_address": "http://39.105.41.113:8081",
+  "hardware_address": "http://192.168.2.83:21727",
   "addressPrefix": "i",
   "chaincodeId": "network",
   "feeLimit": "100000000000"

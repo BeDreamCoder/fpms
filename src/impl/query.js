@@ -18,7 +18,7 @@ function invoke(sender, ccId, fcn, args, msg, counter, feeLimit, sig) {
         args: args,
         message: msg,
         counter: counter,
-        fee_limit: feeLimit,
+        ink_limit: feeLimit,
         sig: sig
     };
     return fetch(config.server_address + "/invoke", {
