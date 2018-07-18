@@ -15,9 +15,10 @@ impl.checkUKey().then((res) => {
     impl.verifyPIN(key, '123456').then((res) => {
         console.log(JSON.stringify(res));
     });
-    // impl.getSignTx('transfer', ['i4230a12f5b0693dd88bb35c79d7e56a68614b199', '1000'], key, uAddress).then((res) => {
-    //     console.log(JSON.stringify(res));
-    // });
+
+    impl.getHashSign(key, "hello world").then((res) => {
+        console.log((res));
+    });
     
     // impl.changePIN(key, '1234567', '12345678').then((res) => {
     //     console.log(JSON.stringify(res));

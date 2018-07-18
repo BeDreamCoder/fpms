@@ -11,6 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 var config = require('./config.json');
+var ethUtils = require('ethereumjs-util');
 var hashHandler = require('./impl/hash');
 var queryHandler = require('./impl/query');
 var verifyHandler = require('./impl/verify');
@@ -67,12 +68,9 @@ var getPublicKeyAndAddress = (key) => {
     });
 };
 
-function getSignTx(fcn, args, key, address) {
-    return hashHandler.sha256_data(fcn, args, key, address).then((result) => {
-        return verifyHandler.signTx(key, result);
-    }, (err) => {
-        return {result: false, code: '500', error: err};
-    }).then((res) => {
+function getHashSign(key, rawData) {
+    var signHash = ethUtils.sha256(Buffer.from(rawData));
+    return verifyHandler.signTx(key, signHash.toString('hex')).then((res) => {
         let apdu = res.apdu;
         let code = apdu.slice(apdu.length - 4);
         if (code === '9000') {
@@ -136,7 +134,7 @@ function queryUser(user) {
     });
 }
 
-module.exports.getSignTx = getSignTx;
+module.exports.getHashSign = getHashSign;
 module.exports.checkUKey = checkUKey;
 module.exports.verifyPIN = verifyPIN;
 module.exports.changePIN = changePIN;
