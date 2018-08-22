@@ -68,6 +68,95 @@ var getPublicKeyAndAddress = (key) => {
     });
 };
 
+var hex2String = (hex) => {
+    var arr = hex.split("");
+    var out = "";
+    for (var i = 0; i < arr.length / 2; i++) {
+        var tmp = "0x" + arr[i * 2] + arr[i * 2 + 1];
+        var charValue = String.fromCharCode(tmp);
+        out += charValue
+    }
+    return out;
+};
+
+
+var string2Hex = (str) => {
+    var val = "";
+    for (var i = 0; i < str.length; i++) {
+        if (val == "")
+            val = str.charCodeAt(i).toString(16);
+        else
+            val += str.charCodeAt(i).toString(16);
+    }
+    val += "0a";
+    return val
+};
+
+var getMnemonic = (key) => {
+    return verifyHandler.genMnemonic(key).then((res) => {
+        let apdu = res.apdu;
+        let code = apdu.slice(apdu.length - 4);
+        if (code === '9000') {
+            let mnemonic = apdu.slice(0, apdu.length - 4);
+            return {result: true, code: hex2String(mnemonic)};
+        } else {
+            return {result: false, code: apdu};
+        }
+    }, (err) => {
+        return {result: false, code: '500', error: err};
+    });
+};
+
+var externalValidation = (key) => {
+    return verifyHandler.getNonce(key).then((res) => {
+        let apdu = res.apdu;
+        let code = apdu.slice(apdu.length - 4);
+        if (code === '9000') {
+            let nonce = apdu.slice(0, apdu.length - 4);
+            return verifyHandler.externalValidation(key, nonce);
+        } else {
+            return {result: false, code: apdu};
+        }
+    }, (err) => {
+        return {result: false, code: '500', error: err};
+    }).then((res) => {
+        let code = res.apdu;
+        if (code === '9000') {
+            return {result: true, code: code};
+        } else {
+            return {result: false, code: code};
+        }
+    }, (err) => {
+        return {result: false, code: '500', error: err};
+    });
+};
+
+var resetUkey = (key) => {
+    return verifyHandler.resetUkey(key).then((res) => {
+        let code = res.apdu;
+        if (code === '9000') {
+            return {result: true, code: code};
+        } else {
+            return {result: false, code: code};
+        }
+    }, (err) => {
+        return {result: false, code: '500', error: err};
+    });
+};
+
+function recoverPrikey(key, words) {
+    return verifyHandler.recoverPrikey(key, words.length, string2Hex(words)).then((res) => {
+        let code = res.apdu;
+        if (code === '9000') {
+            return {result: true, code: code};
+        } else {
+            return {result: false, code: code};
+        }
+    }, (err) => {
+        return {result: false, code: '500', error: err};
+    });
+}
+
 function getHashSign(key, rawData) {
     var signHash = ethUtils.sha256(Buffer.from(rawData));
     return verifyHandler.signTx(key, signHash.toString('hex')).then((res) => {
@@ -86,6 +175,9 @@ function getHashSign(key, rawData) {
 
 function getPermission(fcn, args, key, address) {
     return hashHandler.queryCounter(address).then((result) => {
+        if (!result.result) {
+            return result;
+        }
         let counter = result.data;
         let sigHash = hashHandler.sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address);
         return verifyHandler.signTx(key, sigHash).then((res) => {
@@ -105,7 +197,7 @@ function getPermission(fcn, args, key, address) {
         }, (err) => {
             return Promise.reject(err);
         });
-    }).catch(err => {
+    }, err => {
         return Promise.reject(err);
     });
 }
@@ -134,11 +226,27 @@ function queryUser(user) {
     });
 }
 
+function permissionVerify(sign, content) {
+    return queryHandler.query(config.chaincodeId, "permissionVerify", [sign, content]).then((results) => {
+        if (results.success) {
+            return {result: true, data: results.data};
+        } else {
+            return {result: false, error: results.error};
+        }
+    }, (err) => {
+        return {result: false, error: err};
+    });
+}
+
 module.exports.getHashSign = getHashSign;
 module.exports.checkUKey = checkUKey;
 module.exports.verifyPIN = verifyPIN;
 module.exports.changePIN = changePIN;
 module.exports.getPublicKeyAndAddress = getPublicKeyAndAddress;
+module.exports.getMnemonic = getMnemonic;
+module.exports.resetUkey = resetUkey;
+module.exports.externalValidation = externalValidation;
+module.exports.recoverPrikey = recoverPrikey;
 
 module.exports.getDataTag = getDataTag;
 module.exports.queryUser = queryUser;
@@ -166,3 +274,5 @@ module.exports.getDownloadPermission = function (args, key, address) {
         return {result: false, error: err};
     });
 };
+
+module.exports.permissionVerify = permissionVerify;
