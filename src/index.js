@@ -175,8 +175,8 @@ function getHashSign(key, rawData) {
 
 function getPermission(fcn, args, key, address) {
     return hashHandler.queryCounter(address).then((result) => {
-        if (!result.result) {
-            return result;
+        if (!result.success) {
+            return Promise.reject(result.error);
         }
         let counter = result.data;
         let sigHash = hashHandler.sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address);
@@ -238,6 +238,36 @@ function permissionVerify(sign, content) {
     });
 }
 
+function monitoringRecord(args, key, address) {
+    return hashHandler.queryCounter(address).then((result) => {
+        if (!result.success) {
+            return {result: false, error: result.error};
+        }
+        let fcn = "monitoringRecord";
+        let counter = result.data;
+        let sigHash = hashHandler.sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address);
+        return verifyHandler.signTx(key, sigHash).then((res) => {
+            let apdu = res.apdu;
+            let code = apdu.slice(apdu.length - 4);
+            if (code === '9000') {
+                let sig = apdu.slice(0, apdu.length - 4);
+                return queryHandler.invoke(address, config.chaincodeId, fcn, args, '',
+                    counter, config.feeLimit, sig.toLowerCase()).then((results) => {
+                    return {result: true, data: results};
+                }, (err) => {
+                    return {result: false, error: err};
+                });
+            } else {
+                return {result: false, code: apdu};
+            }
+        }, (err) => {
+            return {result: false, error: err};
+        });
+    }).catch(err => {
+        return {result: false, error: err};
+    });
+}
+
 module.exports.getHashSign = getHashSign;
 module.exports.checkUKey = checkUKey;
 module.exports.verifyPIN = verifyPIN;
@@ -276,3 +306,4 @@ module.exports.getDownloadPermission = function (args, key, address) {
 };
 
 module.exports.permissionVerify = permissionVerify;
+module.exports.monitoringRecord = monitoringRecord;

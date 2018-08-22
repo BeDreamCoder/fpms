@@ -55,6 +55,9 @@ var impl = require('../src/index');
         //     console.log(JSON.stringify(res));
         // });
         //
+        // impl.monitoringRecord(["testIDD", "testTime", "2", "testNum", "testHash"], key, uAddress).then((res) => {
+        //     console.log(JSON.stringify(res));
+        // });
     } catch (e) {
         console.log("catch err:", e)
     }
