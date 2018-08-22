@@ -51,44 +51,6 @@ function verifyPIN(key, pin) {
     });
 }
 
-var getNonce = (key) => {
-    let data = {
-        "apdu": 'DF84000008',
-        "reader": key
-    };
-
-    return fetch(config.hardware_address + "/apdu", {
-        method: "POST",
-        headers: {
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then((result) => {
-        return result.json();
-    }).catch(err => {
-        return Promise.reject(err);
-    });
-};
-
-var externalValidation = (key, nonce) => {
-    let data = {
-        "apdu": 'DF82000008CAAAAF4DEAF1DBAE',
-        "reader": key
-    };
-
-    return fetch(config.hardware_address + "/apdu", {
-        method: "POST",
-        headers: {
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then((result) => {
-        return result.json();
-    }).catch(err => {
-        return Promise.reject(err);
-    });
-};
-
 function changePIN(key, oldpin, newpin) {
     if (!oldpin || !newpin || oldpin.length < 4 || newpin.length < 4
         || oldpin.length > 10 || newpin.length > 10) {
@@ -159,72 +121,6 @@ function signTx(key, dataHash) {
     });
 }
 
-function resetUkey(key) {
-    let data = {
-        "apdu": 'DF010000',
-        "reader": key
-    };
-
-    return fetch(config.hardware_address + "/apdu", {
-        method: "POST",
-        headers: {
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then((result) => {
-        return result.json();
-    }).catch(err => {
-        return Promise.reject(err);
-    });
-}
-
-function genMnemonic(key) {
-    let data = {
-        "apdu": 'DF090000',
-        "reader": key
-    };
-
-    return fetch(config.hardware_address + "/apdu", {
-        method: "POST",
-        headers: {
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then((result) => {
-        return result.json();
-    }).catch(err => {
-        return Promise.reject(err);
-    });
-}
-
-function recoverPrikey(key, wordLength, words) {
-    let data = {
-        "apdu": 'DF0A0000' + wordLength.toString(16) + words,
-        "reader": key
-    };
-
-    return fetch(config.hardware_address + "/apdu", {
-        method: "POST",
-        headers: {
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then((result) => {
-        return result.json();
-    }).catch(err => {
-        return Promise.reject(err);
-    });
-}
-
-function _fetch(fetch, timeout) {
-    return Promise.race([
-        fetch,
-        new Promise(function (resolve, reject) {
-            setTimeout(() => reject(new Error('request timeout')), timeout);
-        })
-    ]);
-}
-
 function stringFill(fstr, flen, fchar) {
     let index = flen - fstr.length;
     for (let i = 0; i < index; i++) {
@@ -244,9 +140,4 @@ module.exports.verifyPIN = verifyPIN;
 module.exports.changePIN = changePIN;
 module.exports.getPublicKeyAndAddress = getPublicKeyAndAddress;
 module.exports.signTx = signTx;
-module.exports.genMnemonic = genMnemonic;
-module.exports.getNonce = getNonce;
-module.exports.externalValidation = externalValidation;
-module.exports.resetUkey = resetUkey;
-module.exports.recoverPrikey = recoverPrikey;
 
