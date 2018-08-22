@@ -86,8 +86,8 @@ function getHashSign(key, rawData) {
 
 function getPermission(fcn, args, key, address) {
     return hashHandler.queryCounter(address).then((result) => {
-        if (!result.result) {
-            return result;
+        if (!result.success) {
+            return Promise.reject(result.error);
         }
         let counter = result.data;
         let sigHash = hashHandler.sha256(config.chaincodeId, fcn, args, "", counter, config.feeLimit, address);
