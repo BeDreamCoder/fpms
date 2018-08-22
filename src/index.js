@@ -96,11 +96,10 @@ function permissionVerify(sign, content) {
     });
 }
 
-
 function monitoringRecord(args, key, address) {
     return hashHandler.queryCounter(address).then((result) => {
-        if (!result.result) {
-            return result;
+        if (!result.success) {
+            return {result: false, error: result.error};
         }
         let fcn = "monitoringRecord";
         let counter = result.data;
@@ -112,18 +111,18 @@ function monitoringRecord(args, key, address) {
                 let sig = apdu.slice(0, apdu.length - 4);
                 return queryHandler.invoke(address, config.chaincodeId, fcn, args, '',
                     counter, config.feeLimit, sig.toLowerCase()).then((results) => {
-                    return Promise.resolve(results);
+                    return {result: true, data: results};
                 }, (err) => {
-                    return Promise.reject(err);
+                    return {result: false, error: err};
                 });
             } else {
-                return Promise.reject(apdu);
+                return {result: false, code: apdu};
             }
         }, (err) => {
-            return Promise.reject(err);
+            return {result: false, error: err};
         });
     }).catch(err => {
-        return Promise.reject(err);
+        return {result: false, error: err};
     });
 }
 
